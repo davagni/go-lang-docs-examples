@@ -41,7 +41,15 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 	}
 }
 
+var validRootPath = regexp.MustCompile("^[^A-Za-z0-9]$|^$")
+
 func rootHandler(w http.ResponseWriter, r *http.Request) {
+	m := validRootPath.FindStringSubmatch(r.URL.Path)
+	if m == nil {
+		http.NotFound(w, r)
+		return
+	}
+
 	p, err := loadPage("FrontPage")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
